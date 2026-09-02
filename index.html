@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔊 Ультразвук</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #111;
+        color: white;
+        font-family: Arial, sans-serif;
+        overflow: hidden;
+    }
+
+    .box {
+        width: 90%;
+        max-width: 500px;
+        padding: 40px 25px;
+        text-align: center;
+        background: #1d1d1d;
+        border: 2px solid #ff3333;
+        border-radius: 20px;
+        box-shadow: 0 0 40px rgba(255, 0, 0, .3);
+    }
+
+    h1 {
+        font-size: 38px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    p {
+        color: #aaa;
+        font-size: 18px;
+        margin-bottom: 25px;
+    }
+
+    button {
+        width: 100%;
+        padding: 22px;
+        border: none;
+        border-radius: 14px;
+        font-size: 22px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    button:hover {
+        transform: scale(1.03);
+    }
+
+    .start {
+        background: #19d35b;
+        color: white;
+    }
+
+    .stop {
+        background: #ff3333;
+        color: white;
+    }
+
+    #status {
+        margin-top: 25px;
+        font-size: 18px;
+        color: #ff7777;
+        min-height: 30px;
+        line-height: 1.4;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1>🔊 УЛЬТРАЗВУК</h1>
+
+    <p>Нажмите кнопку и получите абсолютно бесплатный звук.</p>
+
+    <button id="mainBtn" class="start" onclick="handleClick()">
+        ▶ ВКЛЮЧИТЬ БЕСПЛАТНО
+    </button>
+
+    <div id="status">
+        Звук выключен
+    </div>
+
+</div>
+
+<script>
+let audioContext;
+let oscillator;
+let gain;
+let interval;
+let playing = false;
+
+function handleClick() {
+    if (!playing) {
+        startSound();
+    } else {
+        // Не выключаем звук — показываем требование оплаты
+        document.getElementById("status").textContent =
+            "для того чтобы выключить звук надо оплатить 99$";
+    }
+}
+
+function startSound() {
+    if (playing) return;
+
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    oscillator = audioContext.createOscillator();
+    gain = audioContext.createGain();
+
+    oscillator.type = "square";
+    oscillator.frequency.value = 1800;
+    gain.gain.value = 0.08;
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start();
+    playing = true;
+
+    // Меняем кнопку на "Выключить"
+    const btn = document.getElementById("mainBtn");
+    btn.textContent = "🔇 ВЫКЛЮЧИТЬ";
+    btn.className = "stop";
+
+    document.getElementById("status").textContent =
+        "😈 ЗВУК ВКЛЮЧЕН";
+
+    // Постоянно меняем частоту, чтобы звук был противным
+    interval = setInterval(() => {
+        if (!oscillator) return;
+
+        const frequencies = [
+            1200, 1600, 1900, 2200,
+            1400, 2000, 1700, 2300
+        ];
+
+        oscillator.frequency.value =
+            frequencies[Math.floor(Math.random() * frequencies.length)];
+    }, 180);
+}
+</script>
+
+</body>
+</html>
